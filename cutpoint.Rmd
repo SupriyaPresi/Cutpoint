@@ -1,0 +1,60 @@
+library(readxl)
+library(cutpointr)
+library(dplyr)
+library(foreign)
+
+setwd("C:/Users/USER/Desktop/1AlgoG3/January 23/2.1.22 Dr Subham & Akshay/Akshay")
+
+setwd("C:/Users/USER/Desktop/1AlgoG3/January 23/2.1.22 Dr Subham & Akshay/Subham")
+
+
+df = read.spss("Thesis_BL_dosimetry.sav", use.value.labels=TRUE,  to.data.frame=TRUE)
+
+
+fn = function(i,j,df,r=100){
+  ## i = index of variable whose cut off has to be found
+  ## j = index of grouping variable
+  ## r = Bootstrap Runs
+  m = df[i]
+  n = df[j]
+  
+  colnames(m) = "m"
+  colnames(n) = "n"
+  
+  c = cutpointr(m$m,n$n, na.rm = T, boot_runs = r, metric = youden)
+  ci = boot_ci(c,AUC,in_bag = T, alpha = 0.05)
+  AUC_95CI = paste(round(c$AUC,3), "(",round(ci[1,2],3),"-",round(ci[2,2],3),")",sep="")
+  p = c$boot
+  p = data.frame(p)
+  #t = t.test(p$AUC_oob,alternative = "greater",mu = 0.5)
+  
+  final = paste(AUC_95CI,
+                #round(t$p.value,3),
+                c$optimal_cutpoint,
+                round(c$sensitivity,3),
+                round(c$specificity,3),
+                round(c$acc,3),
+                sep = ","
+  )
+  return(final)
+  ##Parameter,AUC (95% CI),P-Value,Cut-Off,Sensitivity,Specificity,Accuracy
+}
+
+
+## i = index of variable whose cut off has to be found
+## j = index of grouping variable
+df = read.spss("Thesis_SB_dosimetry.sav", use.value.labels=TRUE,  to.data.frame=TRUE)
+name = data.frame(colnames(df))
+write.csv(name,"names.csv")
+
+df1 = c()
+m = 3 
+n = 78
+o = 1
+for( i in m:n){
+  df1[o] = fn(i,2,df)
+  o = o+1
+}
+df1 = data.frame(df1)
+#print(data.frame(df1), row.names = FALSE)
+write.csv(df1,"Thesis_SB_dosimetry.csv")
