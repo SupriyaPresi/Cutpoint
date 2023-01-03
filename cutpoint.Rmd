@@ -3,11 +3,6 @@ library(cutpointr)
 library(dplyr)
 library(foreign)
 
-setwd("C:/Users/USER/Desktop/1AlgoG3/January 23/2.1.22 Dr Subham & Akshay/Akshay")
-
-setwd("C:/Users/USER/Desktop/1AlgoG3/January 23/2.1.22 Dr Subham & Akshay/Subham")
-
-
 df = read.spss("Thesis_BL_dosimetry.sav", use.value.labels=TRUE,  to.data.frame=TRUE)
 
 
